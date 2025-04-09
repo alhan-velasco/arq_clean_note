@@ -1,0 +1,17 @@
+/* Reset básico */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  line-height: 1.6;
+}
+
+/* Estilos base para la aplicación */
+#root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+}
