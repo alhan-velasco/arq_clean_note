@@ -1,65 +1,39 @@
-import { useState, useEffect } from 'react'
-import ReminderRepository from '../../data/repository/reminder.repository'
-import { GetReminders } from '../../domain/usecases/GetReminders'
-import { CreateReminder } from '../../domain/usecases/CreateReminder'
-import { UpdateReminder } from '../../domain/usecases/UpdateRemider'
-import { DeleteReminder } from '../../domain/usecases/DeleteReminder'
-
-const reminderRepository = new ReminderRepository()
-
-const getRemindersUseCase = GetReminders(reminderRepository)
-const createReminderUseCase = CreateReminder(reminderRepository)
-const updateReminderUseCase = UpdateReminder(reminderRepository)
-const deleteReminderUseCase = DeleteReminder(reminderRepository)
+import { useState, useEffect } from 'react';
 
 export default function useReminders() {
-  const [reminders, setReminders] = useState([])
-  const [loading, setLoading] = useState(false)
-  const [editingReminder, setEditingReminder] = useState(null)
+  const [reminders, setReminders] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [editingReminder, setEditingReminder] = useState(null);
 
   useEffect(() => {
-    fetchReminders()
-  }, [])
+    setTimeout(() => {
+      setReminders([]);
+      setLoading(false);
+    }, 1000);
+  }, []);
 
-  const fetchReminders = async () => {
-    setLoading(true)
-    try {
-      const reminders = await getRemindersUseCase()
-      setReminders(reminders)
-    } catch (error) {
-      console.error('Error fetching reminders:', error)
-    } finally {
-      setLoading(false)
-    }
-  }
+  const createReminder = (newReminder) => {
+    setReminders(prev => [...prev, { ...newReminder, ID: Date.now() }]);
+  };
 
-  const createReminder = async (reminderData) => {
-    try {
-      await createReminderUseCase(reminderData)
-      await fetchReminders()
-    } catch (error) {
-      console.error('Error creating reminder:', error)
-    }
-  }
+  const updateReminder = (updatedReminder) => {
+    setReminders(prev =>
+      prev.map(r => (r.ID === updatedReminder.id ? { ...r, ...updatedReminder } : r))
+    );
+    setEditingReminder(null);
+  };
 
-  const updateReminder = async (reminderData) => {
-    try {
-      await updateReminderUseCase(reminderData.id, reminderData)
-      setEditingReminder(null)
-      await fetchReminders()
-    } catch (error) {
-      console.error('Error updating reminder:', error)
-    }
-  }
+  const deleteReminder = (id) => {
+    setReminders(prev => prev.filter(r => r.ID !== id));
+  };
 
-  const deleteReminder = async (id) => {
-    try {
-      await deleteReminderUseCase(id)
-      await fetchReminders()
-    } catch (error) {
-      console.error('Error deleting reminder:', error)
+  const handleSubmit = (reminderData) => {
+    if (reminderData.id) {
+      updateReminder(reminderData);
+    } else {
+      createReminder(reminderData);
     }
-  }
+  };
 
   return {
     reminders,
@@ -68,6 +42,7 @@ export default function useReminders() {
     setEditingReminder,
     createReminder,
     updateReminder,
-    deleteReminder
-  }
+    deleteReminder,
+    handleSubmit
+  };
 }
