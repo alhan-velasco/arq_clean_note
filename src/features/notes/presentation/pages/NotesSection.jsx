@@ -1,37 +1,39 @@
+import { useState } from 'react';
 import { useNotes } from "../viewmodels/useNotes";
-
-import NoteForm from '../views/NoteForm'
-import NotesList from '../views/NotesList'
-
+import NoteForm from '../views/NoteForm';
+import NotesList from '../views/NotesList';
 
 export default function NotesSection() {
   const {
     notes,
     loading,
-    editingNote,
-    setEditingNote,
-    createNote,
+    addNote,
     updateNote,
-    deleteNote
-  } = useNotes()
-
-  const handleSubmit = (noteData) => {
-    if (noteData.id) {
-      updateNote(noteData)
-    } else {
-      createNote(noteData)
-    }
-  }
+    removeNote
+  } = useNotes();
+  
+  const [editingNote, setEditingNote] = useState(null);
 
   return (
     <div className="section-container">
       <h2 className="section-title">Notas</h2>
+      <NoteForm 
+        onSubmit={(noteData) => {
+          if (editingNote) {
+            updateNote(editingNote.id, noteData);
+            setEditingNote(null);
+          } else {
+            addNote(noteData);
+          }
+        }}
+        initialNote={editingNote} 
+      />
       <NotesList
         notes={notes}
         loading={loading}
         onEdit={setEditingNote}
-        onDelete={deleteNote}
+        onDelete={removeNote}
       />
     </div>
-  )
+  );
 }
