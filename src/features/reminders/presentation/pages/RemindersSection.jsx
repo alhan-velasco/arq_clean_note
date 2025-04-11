@@ -1,5 +1,5 @@
 import useReminders from '../viewmodels/useReminders';
-import ReminderForm from '../views/RemindersForm';
+import { ReminderForm } from '../views/RemindersForm';
 import RemindersList from '../views/RemindersList';
 
 export default function RemindersSection() {
